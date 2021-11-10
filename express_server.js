@@ -1,9 +1,10 @@
 const express = require("express");
 const app = express();
-const PORT = 3005;
+const PORT = 8080;
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 app.use(bodyParser.urlencoded({extended: true}));
-
+app.use(cookieParser())
 // app.use(express.urlencoded());
 app.set("view engine", "ejs");
 
@@ -20,15 +21,20 @@ function generateRandomString() {
   }
   return randomArray.join("");
 }
-
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username)
+  res.redirect('/urls')
+});
 app.get("/urls", (req, res) => {
   console.log('URL:', urlDatabase)
-  const templateVars = { urls: urlDatabase };
+  console.log(req.cookies)
+  const templateVars = {urls: urlDatabase, username: req.cookies['username'] };
   res.render("urls_index", templateVars);
 });
-
+//post only posts to back end get displays things send template bars check browser
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {urls: urlDatabase, username: req.cookies['username'] };
+  res.render("urls_new",templateVars);
 });
   
 app.post("/urls/:shortURL", (req, res) => {
@@ -46,8 +52,13 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect("/urls");
 });
 
+app.post('/logout', (req,res) => {
+  res.clearCookie('username')
+  res.redirect('/urls')
+})
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
+    username: req.cookies.username,
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
   };

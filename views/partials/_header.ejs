@@ -12,17 +12,17 @@
         <%if (!user) {%>
         <a class="nav-item nav-link" href="/register">Register</a>
         <a class="nav-item nav-link" href="/login">Log in</a>
+        <%} else  { %>
+          <form class="form-inline" action="/logout" method="POST">
+            <div class="form-group mb-2">
+              <a class="nav-item">You are Logged in as <%= user['email'] %></a>
+              <button type="submit" class="btn btn-outline-dark">LogOut</button>
+            </div>
+          </form>
+        <% } %> 
       </div>
     </div>
     
-  <%} else  { %>
-    <form class="form-inline" action="/logout" method="POST">
-      <div class="form-group mb-2">
-        <a class="nav-item">You are Logged in as <%= user.email %></a>
-        <button type="submit" class="btn btn-primary">LogOut</button>
-      </div>
-    </form>
-  <% } %> 
   </nav>
 
 </header>

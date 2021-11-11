@@ -34,6 +34,16 @@ const users = {
     password: "dishwasher-funk",
   }
 };
+const lookUpByEmail = function(objectOfObjects, themail) {
+  let userId
+  for (const user in objectOfObjects) {
+  
+    if (objectOfObjects[user].email === themail) {
+      userId = user
+  }
+}
+return userId
+}
 const lookUpEmail = (objectOfObjects, email) => {  
   
   for (const user in objectOfObjects) {
@@ -64,14 +74,35 @@ app.post("/register", (req, res) => {
       );
   }
 });
-app.get("/login", (req, res) => {
 
-  res.render('user_login')
+app.get("/login", (req, res) => {
+  const templateVars = { user: req.cookies["user_id"] };
+  res.render('user_login', templateVars)
 });
+
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
+  if (!lookUpEmail(users, req.body.email)) {
+   return res
+      .status(403)
+      .send(
+        "403 \n That email address is not registered. 🔕"
+      );
+  } 
+  let id = lookUpByEmail(users, req.body.email)
+  if (users[id].password !== req.body.password) {
+    return res
+      .status(403)
+      .send(
+        "403 \n That password doesn't correspond, please try again. 🔕"
+      );
+  }
+  console.log(id)
+
+  res.cookie("user_id", id);
   res.redirect("/urls");
-});
+  }
+);
+
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, user: users[req.cookies.user_id] };
   res.render("urls_index", templateVars);
@@ -86,6 +117,7 @@ app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.updateURL;
   res.redirect("/urls");
 });
+
 app.post("/urls", (req, res) => {
   const randomString = generateRandomString();
   urlDatabase[randomString] = req.body.longURL;
@@ -115,7 +147,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 app.get("/register", (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const templateVars = { user: req.cookies["user_id"] };
   res.render("user-registration", templateVars);
 });
 app.listen(PORT, () => {

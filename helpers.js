@@ -20,7 +20,7 @@ function generateRandomString() {
   return randomArray.join("");
 }
 
-//allocates the urls specific for the current user
+//allocates the specific urls for the current user
 const urlsForUser = function (database, id) {
   let usersUrls = {};
   for (let urls in database) {

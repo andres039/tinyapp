@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8080;
+const PORT = 8081;
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const morgan = require("morgan");
@@ -28,7 +28,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   if (lookUpByEmail(users, email)) {
-    return res.status(404).send("404 \n That email is already in use");
+    return res.status(404).send("<h2>404 \n That email is already in use</h2>");
   }
 
   if (email && password) {
@@ -45,7 +45,7 @@ app.post("/register", (req, res) => {
     res
       .status(404)
       .send(
-        "404 \n You know what you did!... \n if you do not, how about we enter an email address or password? 🔕"
+        "<h1>404 \n You know what you did!... \n if you do not, how about we enter an email address or password? 🔕</h1>"
       );
   }
 });
@@ -61,14 +61,14 @@ app.post("/login", (req, res) => {
   if (!lookUpByEmail(users, email)) {
     return res
       .status(403)
-      .send("403 \n That email address is not registered. 🔕");
+      .send("<h2>403 \n That email address is not registered. 🔕</h2>");
   }
   let id = lookUpByEmail(users, email);
   //verifies hashed password
   if (!bcrypt.compareSync(req.body.password, users[id].password)) {
     return res
       .status(403)
-      .send("403 \n The password doesn't match 🔥, please try again. 🔕");
+      .send("<h2>403 \n The password doesn't match 🔥, please try again. 🔕</h2>");
   }
 
   req.session.user_id = id;
@@ -98,44 +98,40 @@ app.get("/urls/new", (req, res) => {
 
 //edit endpoint
 app.post("/urls/:shortURL", (req, res) => {
-
   const shortURL = req.params.shortURL;
 
   if (req.session.user_id === urlDatabase[shortURL].userID) {
     urlDatabase[shortURL]["longURL"] = req.body.updateURL;
     return res.redirect("/urls");
-  } else res.send("Please log in to make any changes");
+  }  res.send("<h2>Please log in to make any changes</h2>");
 });
 
 //add new urls
 app.post("/urls", (req, res) => {
-
   const randomString = generateRandomString();
   const userID = req.session.user_id;
 
   if (userID) {
-
     urlDatabase[randomString] = {};
     urlDatabase[randomString]["longURL"] = req.body.longURL;
     urlDatabase[randomString]["userID"] = userID;
-    
+
     return res.redirect(`/urls/${randomString}`);
   }
 
-  res.send("You must be logged in to add URLs");
+  res.send("</h2>You must be logged in to add URLs</h2>");
 });
 
 //delete URLs
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-
-  const shortURL = req.params.shortURL
+  const shortURL = req.params.shortURL;
 
   if (req.session.user_id === urlDatabase[shortURL].userID) {
     delete urlDatabase[shortURL];
     return res.redirect("/urls");
   } else {
-    res.send("Please log in to make any changes");
+    res.send("<h2>Please log in to make any changes</h2>");
   }
 });
 
@@ -145,11 +141,12 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  
   if (!req.session.user_id) {
-   return res.send('Please log in to make any changes')
+    return res.send("<h2>Please log in to make any changes</h2>");
   }
-
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.send('Invalid short URL')
+  }
   const templateVars = {
     user: users[req.session.user_id],
     shortURL: req.params.shortURL,
@@ -160,10 +157,9 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  
   if (!urlDatabase[req.params.id]) {
-    return res.send('<h1>That short URL is not real... yet</h1>')
-   }
+    return res.send("<h1>That short URL is not real... yet</h1>");
+  }
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL]["longURL"].includes("https://")
     ? urlDatabase[shortURL]["longURL"]

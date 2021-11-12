@@ -1,4 +1,3 @@
-
 const lookUpByEmail = function (objectOfObjects, themail) {
   let userId;
   for (const user in objectOfObjects) {
@@ -15,6 +14,6 @@ const lookUpEmail = (objectOfObjects, email) => {
       return true;
     }
   }
-}
+};
 
-module.exports = {lookUpEmail, lookUpByEmail}
+module.exports = { lookUpEmail, lookUpByEmail };

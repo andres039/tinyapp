@@ -2,10 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
-const cookieSession = require('cookie-session');
+const cookieSession = require("cookie-session");
 const morgan = require("morgan");
-const bcrypt = require('bcryptjs');
-const {lookUpByEmail, lookUpEmail} = require('./helpers.js');
+const bcrypt = require("bcryptjs");
+const { lookUpByEmail, lookUpEmail } = require("./helpers.js");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
@@ -41,12 +41,12 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: bcrypt.hashSync('123', 10)
+    password: bcrypt.hashSync("123", 10),
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: bcrypt.hashSync('123', 10)
+    password: bcrypt.hashSync("123", 10),
   },
 };
 
@@ -70,7 +70,7 @@ app.post("/register", (req, res) => {
       id: userId,
       email: req.body.email,
       //hash the password
-      password: bcrypt.hashSync(req.body.password, 10)
+      password: bcrypt.hashSync(req.body.password, 10),
     };
     req.session.user_id = userId;
     res.redirect("/urls");
@@ -116,7 +116,6 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-
   const usersUrls = urlsForUser(urlDatabase, req.session.user_id);
   const templateVars = { urls: usersUrls, user: users[req.session.user_id] };
   console.log("users urls:", usersUrls);
@@ -149,7 +148,7 @@ app.post("/urls", (req, res) => {
 //delete URLs
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  console.log('urlDatabase:', urlDatabase)
+  console.log("urlDatabase:", urlDatabase);
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     return res.redirect("/urls");
@@ -159,8 +158,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  //res.clearCookie("user_id");
-  req.session = null
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -180,8 +178,6 @@ app.get("/u/:id", (req, res) => {
     : "https://" + urlDatabase[shortURL]["longURL"];
 
   res.redirect(longURL);
-
-  //return res.send("The requested ID doesnt exist... yet");
 });
 app.get("/register", (req, res) => {
   const templateVars = { user: req.session.user_id };
@@ -190,4 +186,4 @@ app.get("/register", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
-})
+});

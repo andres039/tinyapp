@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const morgan = require("morgan");
+const bcrypt = require('bcryptjs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
@@ -86,7 +87,8 @@ app.post("/register", (req, res) => {
     users[userId] = {
       id: userId,
       email: req.body.email,
-      password: req.body.password,
+      //hash the password
+      password: bcrypt.hashSync(req.body.password, 10)
     };
     res.cookie("user_id", userId);
     res.redirect("/urls");
@@ -111,12 +113,11 @@ app.post("/login", (req, res) => {
       .send("403 \n That email address is not registered. 🔕");
   }
   let id = lookUpByEmail(users, req.body.email);
-  if (users[id].password !== req.body.password) {
+  if (bcrypt.compareSync(users[id].password, req.body.password)) {
     return res
       .status(403)
       .send("403 \n That password doesn't correspond, please try again. 🔕");
   }
-  console.log("id:", id);
 
   res.cookie("user_id", id);
   res.redirect("/urls");

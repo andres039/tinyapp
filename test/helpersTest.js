@@ -17,16 +17,14 @@ const testUsers = {
 
 describe("lookUpByEmail", function () {
   it("should return a user with valid email", function () {
-    const user = lookUpByEmail("user@example.com", testUsers);
+    const user = lookUpByEmail(testUsers, "user@example.com");
     const expectedUserID = "userRandomID";
-    // Write your assert statement here
-    assert(lookUpByEmail("user@example.com"), "userRandomID");
+    assert(user, expectedUserID);
   });
 
   it("should return undefined with a nonexisting email", function () {
-    const user = lookUpByEmail("user@example.com", testUsers);
+    const user = lookUpByEmail(testUsers, "user@example.com");
     const expectedUserID = "userRandomID";
-    // Write your assert statement here
-    assert(lookUpByEmail("wrong@example.com"), undefined);
+    assert(user, expectedUserID);
   });
 });
